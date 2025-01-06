@@ -13,7 +13,11 @@ type Circle struct {
 	color color.Color
 }
 
-func (c Circle) Draw(screen *ebiten.Image) {
+func NewCircle(x, y float64, rad int, c color.Color) *Circle {
+	return &Circle{x, y, rad, c}
+}
+
+func (c *Circle) Draw(screen *ebiten.Image) {
 	rad_squared := math.Pow(float64(c.rad), 2)
 	diam := 2 * c.rad
 	img := ebiten.NewImage(diam, diam)
@@ -39,14 +43,30 @@ func (c Circle) Draw(screen *ebiten.Image) {
 		}
 	}
 	opts := &ebiten.DrawImageOptions{}
-	opts.GeoM.Translate(c.x, c.y)
+	opts.GeoM.Translate(c.x-float64(c.rad), c.y-float64(c.rad))
 	screen.DrawImage(img, opts)
 }
 
-func (c Circle) Update() error {
+func (c *Circle) Update() error {
+	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+		x, y := ebiten.CursorPosition()
+		if c.isPointInCircle(float64(x), float64(y)) {
+			c.x, c.y = float64(x), float64(y)
+		}
+	}
 	return nil
 }
 
-func NewCircle(x, y float64, rad int, c color.Color) Circle {
-	return Circle{x, y, rad, c}
+func (c *Circle) isPointInCircle(x, y float64) bool {
+	if x > c.x+float64(c.rad) || x < c.x-float64(c.rad) ||
+		y > c.y+float64(c.rad) || y < c.y-float64(c.rad) {
+		return false
+	}
+
+	rad_squared := math.Pow(float64(c.rad), 2)
+	dist_squared := math.Pow(x-c.x, 2) + math.Pow(y-c.y, 2)
+	if dist_squared > rad_squared {
+		return false
+	}
+	return true
 }
