@@ -1,8 +1,10 @@
 package main
 
 import (
+	"image/color"
 	"log"
 	"rt-demo/config"
+	"rt-demo/shape"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -33,7 +35,11 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 func main() {
 	ebiten.SetWindowSize(640, 480)
 	ebiten.SetWindowTitle("RT Demo")
-	if err := ebiten.RunGame(&Game{}); err != nil {
+	if err := ebiten.RunGame(&Game{
+		sprites: []Sprite{
+			shape.NewCircle(50, 50, 50, color.White),
+		},
+	}); err != nil {
 		log.Fatal(err)
 	}
 }
