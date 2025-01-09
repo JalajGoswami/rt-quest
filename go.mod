@@ -1,4 +1,4 @@
-module rt-demo
+module rt-quest
 
 go 1.23.3
 

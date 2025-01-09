@@ -1,16 +1,17 @@
 package main
 
 import (
-	"image/color"
+	"fmt"
 	"log"
-	"rt-demo/config"
-	"rt-demo/shape"
+	"rt-quest/config"
+	"rt-quest/luminous"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Game struct {
-	sprites []Sprite
+	sprites     []Sprite
+	lightSource luminous.Illuminant
 }
 
 func (g *Game) Update() error {
@@ -26,6 +27,7 @@ func (g *Game) Draw(screen *ebiten.Image) {
 	for _, sprite := range g.sprites {
 		sprite.Draw(screen)
 	}
+	g.lightSource.DrawRays(screen)
 }
 
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
@@ -33,12 +35,15 @@ func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeigh
 }
 
 func main() {
-	ebiten.SetWindowSize(640, 480)
+	var a = 2.8
+	fmt.Println(int(a))
+	ebiten.SetWindowSize(800, 600)
 	ebiten.SetWindowTitle("RT Demo")
 	if err := ebiten.RunGame(&Game{
 		sprites: []Sprite{
-			shape.NewCircle(50, 50, 50, color.White),
+			// shape.NewCircle(50, 50, 40, color.White),
 		},
+		lightSource: luminous.NewIlluminant(20, 20),
 	}); err != nil {
 		log.Fatal(err)
 	}
