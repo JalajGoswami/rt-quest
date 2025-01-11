@@ -3,6 +3,8 @@ package shape
 import (
 	"image/color"
 	"math"
+	"rt-quest/config"
+	"time"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
@@ -15,6 +17,10 @@ type Circle struct {
 
 func NewCircle(x, y float64, rad int, c color.Color) *Circle {
 	return &Circle{x, y, rad, c}
+}
+
+func (c *Circle) Pos() (x, y float64) {
+	return c.x, c.y
 }
 
 func (c *Circle) Draw(screen *ebiten.Image) {
@@ -47,13 +53,22 @@ func (c *Circle) Draw(screen *ebiten.Image) {
 	screen.DrawImage(img, opts)
 }
 
+var interval = 4 * time.Second
+
 func (c *Circle) Update() error {
-	if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
-		x, y := ebiten.CursorPosition()
-		if c.isPointInCircle(float64(x), float64(y)) {
-			c.x, c.y = float64(x), float64(y)
-		}
-	}
+	// if ebiten.IsMouseButtonPressed(ebiten.MouseButtonLeft) {
+	// x, y := ebiten.CursorPosition()
+	// if c.isPointInCircle(float64(x), float64(y)) {
+	// 	c.x, c.y = float64(x), float64(y)
+	// }
+	// }
+	tick := time.Now().Sub(time.Now().Truncate(interval)).Milliseconds()
+	step := float64(tick) / float64(interval.Milliseconds())
+	sinValue := math.Sin(step * math.Pi)
+	secondFactor := math.Abs(math.Sin(step * 4 * math.Pi))
+	c.x = sinValue*float64(config.SCREEN_WIDTH-2*c.rad) + float64(c.rad)
+	c.y = secondFactor*float64(config.SCREEN_HEIGHT-2*c.rad) + float64(c.rad)
+
 	return nil
 }
 

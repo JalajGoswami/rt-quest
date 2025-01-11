@@ -5,20 +5,21 @@ import (
 	"log"
 	"math"
 	"rt-quest/config"
+	"rt-quest/sprite"
 
 	"github.com/hajimehoshi/ebiten/v2"
 )
 
 type Illuminant struct {
-	x, y     float64
-	rayCount int
+	x, y         float64
+	rayCount     int
+	sourceObject sprite.Sprite
 }
 
-func NewIlluminant(x, y float64) Illuminant {
-	return Illuminant{x, y, 3}
+func NewIlluminant(s sprite.Sprite, rayCount int) Illuminant {
+	x, y := s.Pos()
+	return Illuminant{x, y, rayCount, s}
 }
-
-var first = true
 
 func (i *Illuminant) DrawRays(screen *ebiten.Image) {
 	if i.rayCount == 0 {
@@ -29,11 +30,14 @@ func (i *Illuminant) DrawRays(screen *ebiten.Image) {
 	for range i.rayCount {
 		for x := range config.SCREEN_WIDTH {
 			y := math.Tan(angle)*(float64(x)-i.x) + i.y
-			if y > config.SCREEN_HEIGHT || y < 0 {
-				break
+			if y <= config.SCREEN_HEIGHT && y >= 0 {
+				screen.Set(x, int(y), color.RGBA{255, 255, 0, 255})
 			}
-			screen.Set(x, int(y), color.White)
 		}
 		angle += delta
 	}
+}
+
+func (i *Illuminant) Update() {
+	i.x, i.y = i.sourceObject.Pos()
 }
